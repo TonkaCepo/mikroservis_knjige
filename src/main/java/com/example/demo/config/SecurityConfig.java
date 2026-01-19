@@ -11,6 +11,12 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
+/**
+ * Security configuration for Sprint 1.
+ * Defines in-memory users and role-based access control (RBAC)
+ * for USER and ADMIN roles.
+ */
+
 public class SecurityConfig {
 
     @Bean
