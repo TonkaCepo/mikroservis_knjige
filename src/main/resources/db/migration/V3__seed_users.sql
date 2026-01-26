@@ -1,17 +1,27 @@
--- Passwords are BCrypt hashes
--- user / user123
-INSERT INTO users(username, password_hash, enabled) VALUES
-('user',  '$2a$10$4YtS7oJQqO6ZPqQm2cJw9eYk4zH1m7J6VvV4Y8gCqzEw9Yg8o3g8G', TRUE);
+-- V3__seed_users.sql (H2) - idempotentno
 
--- admin / admin123
-INSERT INTO users(username, password_hash, enabled) VALUES
-('admin', '$2a$10$5O3b0cVnJ0p0wF7oEo2K0uG5m9hQGd7y5Zc8z2p8VnXbYw2oYkQvC', TRUE);
+-- roles
+MERGE INTO roles (name) KEY(name) VALUES ('ADMIN');
+MERGE INTO roles (name) KEY(name) VALUES ('USER');
 
--- map roles
-INSERT INTO user_roles(user_id, role_id)
-SELECT u.id, r.id FROM users u, roles r
-WHERE u.username='user' AND r.name='USER';
+-- users
+-- BCrypt hash za "admin123"
+MERGE INTO users (username, password_hash, enabled) KEY(username)
+VALUES ('admin', '$2a$10$NjhHs4JOayo6ttSPmn6Pm.FDZZJ9D5Jrwp1.DDB2wkVrj6pXD9tme', TRUE);
 
-INSERT INTO user_roles(user_id, role_id)
-SELECT u.id, r.id FROM users u, roles r
-WHERE u.username='admin' AND r.name='ADMIN';
+-- BCrypt hash za "user123"
+MERGE INTO users (username, password_hash, enabled) KEY(username)
+VALUES ('user', '$2a$10$bIaXF2JSDX.7RW9550N5lulO98IzRY.B904rrOMbPa.mn0VuU61M.', TRUE);
+
+-- user_roles (spoji po username i rolename)
+MERGE INTO user_roles (user_id, role_id) KEY(user_id, role_id)
+SELECT u.id, r.id
+FROM users u
+JOIN roles r ON r.name = 'ADMIN'
+WHERE u.username = 'admin';
+
+MERGE INTO user_roles (user_id, role_id) KEY(user_id, role_id)
+SELECT u.id, r.id
+FROM users u
+JOIN roles r ON r.name = 'USER'
+WHERE u.username = 'user';
