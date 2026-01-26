@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -15,6 +16,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtFilter;
@@ -31,7 +33,6 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .authorizeHttpRequests(auth -> auth
-                        // LOGIN + SWAGGER + H2 = OTVORENO
                         .requestMatchers(
                                 "/api/auth/**",
                                 "/swagger-ui/**",
@@ -40,17 +41,13 @@ public class SecurityConfig {
                                 "/h2-console/**"
                         ).permitAll()
 
-                        // RBAC rute
                         .requestMatchers("/admin").hasRole("ADMIN")
                         .requestMatchers("/user").hasAnyRole("USER", "ADMIN")
 
-                        // sve ostalo mora imati token
                         .anyRequest().authenticated()
                 )
 
                 .headers(headers -> headers.frameOptions(frame -> frame.disable()))
-
-                // JWT filter
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -69,7 +66,6 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        // VAŽNO: jer su ti passwordi u bazi BCrypt hash
         return new BCryptPasswordEncoder();
     }
 }
