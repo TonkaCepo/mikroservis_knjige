@@ -5,6 +5,40 @@ spring:
   application:
     name: demo-books-service
 
+  datasource:
+    url: jdbc:h2:file:./data/librarydb;MODE=PostgreSQL;AUTO_SERVER=TRUE
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
 springdoc:
   swagger-ui:
     path: /swagger-ui
+
+security:
+  jwt:
+    # BASE64 secret (mora biti dovoljno dug za HS256)
+    secret: "bW9qX3Rlc3Rfc2VjcmV0X2R1Z2Fja2FfMzJfY2hhcnNfbWluaW11bQ=="
+    access-minutes: 15
+
+app:
+  jwt:
+    # ostavi ovo ako ti treba kasnije za refresh logiku (trenutno JwtService ga ne koristi)
+    refresh-token-days: 7
