@@ -1,0 +1,19 @@
+version: '3.8'
+services:
+  knjige:
+    build: .
+    container_name: knjige
+    image: knjige:latest
+    ports:
+      - "80:8080"
+    networks:
+      - rest-network
+    volumes:
+      - java-data:/app/uploads
+
+networks:
+  rest-network:
+    driver: bridge
+
+volumes:
+  java-data:
